@@ -1,0 +1,8 @@
+k, n = [int(i) for i in input().split()]
+
+if ((n % k) == 0):
+    print(n//k)
+elif ((n % k) == 1):
+    print((n//k))
+else:
+    print((n//k) + 1)
