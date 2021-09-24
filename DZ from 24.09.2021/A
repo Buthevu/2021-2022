@@ -1,0 +1,7 @@
+h1, a1 = [int(i) for i in input().split()]
+h2, a2 = [int(i) for i in input().split()]
+
+if (((h1 + a2 - 1) // a2) + 1 > ((h2 + a1 - 1) // a1)):
+    print("Bandergolf Cyberswitch")
+else:
+    print("Benadryl Cabbagepatch")
