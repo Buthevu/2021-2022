@@ -1,0 +1,139 @@
+#include<iostream>
+#include<string>
+#include<vector>
+#include<map>
+
+using namespace std;
+
+vector<int> graph[100000];
+map<int, int> value[100000];
+
+int n;
+
+void make_tree(int i)
+{
+	for (int it = 0; it < graph[i].size(); it++)
+	{
+		vector<int> l = graph[graph[i][it]];
+		graph[graph[i][it]] = vector<int>();
+		for (int x = 0; x < l.size(); x++)
+		{
+			if (l[x] != i)
+			{
+				graph[graph[i][it]].push_back(l[x]);
+			}
+		}
+		make_tree(graph[i][it]);
+	}
+}
+
+void count(int v)
+{
+	for (int i = 0; i < graph[v].size(); i++)
+	{
+		count(graph[v][i]);
+	}
+	map <int, int> min;
+	vector <vector <int>> check(graph[v].size() + 1);
+	for (int i = 0; i < graph[v].size(); i++)
+	{
+		auto it = value[graph[v][i]].upper_bound(graph[v].size());
+		auto to_min = min.find((*it).second);
+		if (to_min == min.end())
+		{
+			min.insert(make_pair((*it).second,1));
+		}
+		else
+		{
+			to_min->second = to_min->second + 1;
+		}
+		if (it != value[graph[v][i]].begin())
+		{
+			it--;
+			check[(*it).first].push_back(graph[v][i]);
+		}
+	}
+	int last = 1000000;
+	for (int lev = graph[v].size(); lev > 0; lev--)
+	{
+		for (int i = 0; i < check[lev].size(); i++)
+		{
+			int x;
+			int y;
+			int work = check[lev][i];
+			auto it = value[work].upper_bound(lev);
+			x = it->second;
+			it--;
+			y = it->second;
+			auto to_min = min.find(x);
+			to_min->second = to_min->second - 1;
+			if ((to_min->second) == 0)
+			{
+				min.erase(to_min);
+			}
+			to_min = min.find(y);
+			if (to_min == min.end())
+			{
+				min.insert(make_pair(y, 1));
+			}
+			else
+			{
+				to_min->second = to_min->second + 1;
+			}
+		}
+		int sum = 0;
+		auto to_min = min.end();
+		while (sum < lev)
+		{
+			to_min--;
+			sum += (to_min->second);
+		}
+		if (last != ((to_min->first) + 1))
+		{
+			value[v].insert(make_pair(lev, (to_min->first) + 1));
+		}
+	}
+	value[v].insert(make_pair(n,1));
+}
+
+
+
+int main()
+{
+	cin >> n;
+	int a;
+	int b;
+	for (int i = 0; i < n - 1; i++)
+	{
+		cin >> a >> b;
+		a = a - 1;
+		b = b - 1;
+		graph[a].push_back(b);
+		graph[b].push_back(a);
+	}
+	make_tree(0);
+	count(0);
+	vector <int> vect(n + 1);
+	for (int i = 0; i < n; i++)
+	{
+		for (auto it = value[i].begin(); it != value[i].end(); it++)
+		{
+			if (vect[it->first] < (it->second))
+			{
+				vect[it->first] = (it->second);
+			}
+		}
+	}
+	for (int i = n - 1; i > 0; i--)
+	{
+		if (vect[i + 1] > vect[i])
+		{
+			vect[i] = vect[i + 1];
+		}
+	}
+	for (int i = 1; i < n + 1; i++)
+	{
+		cout << vect[i] << " ";
+	}
+	return 0;
+}
