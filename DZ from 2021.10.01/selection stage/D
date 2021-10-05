@@ -1,0 +1,14 @@
+q = int(input())
+for tim in range(q):
+    k,s,t = [i for i in input().split()]
+    k = int(k)
+    i = 0
+    while (i < min(len(s),len(t))):
+        if (s[i] != t[i]):
+            break
+        i = i + 1
+    need = len(s) - i + len(t) - i
+    if ((need <= k) and (((need - k) % 2) == 0)):
+        print("Yes")
+    else:
+        print("No")
