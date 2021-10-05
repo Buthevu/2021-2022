@@ -1,0 +1,13 @@
+n, a, b = [int(i) for i in input().split()]
+
+t = (n / (a + b))
+
+if (t == int(t)):
+    t = int(t)
+else:
+    t = int(t + 1)
+
+if (a == b):
+    print(t)
+else:
+    print((t * (t + 1)) // 2)
