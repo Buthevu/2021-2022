@@ -1,0 +1,53 @@
+#include <iostream>
+#include <set>
+#include <vector>
+
+using namespace std;
+
+int cost[100];
+
+vector <int> graph[100];
+
+int dist[100];
+
+int main() {
+	int n;
+	cin >> n;
+	for (int i = 0; i < n; i++)
+	{
+		cin >> cost[i];
+		dist[i] = -1;
+	}
+	int m;
+	cin >> m;
+	for (int i = 0; i < m; i++)
+	{
+		int a;
+		int b;
+		cin >> a >> b;
+		a = a - 1;
+		b = b - 1;
+		graph[a].push_back(b);
+		graph[b].push_back(a);
+	}
+	set <pair<int, int>> pir;
+	pir.insert(make_pair(0, 0));
+	while (pir.empty() == false)
+	{
+		auto it = pir.begin();
+		int d = (*it).first;
+		int x = (*it).second;
+		pir.erase(it);
+		if (dist[x] != -1)
+		{
+			continue;
+		}
+		dist[x] = d;
+		for (int i = 0; i < graph[x].size(); i++)
+		{
+			pir.insert(make_pair(d + cost[x], graph[x][i]));
+		}
+	}
+	cout << dist[n - 1];
+	return 0;
+}
