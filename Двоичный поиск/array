@@ -1,0 +1,18 @@
+print("Length of array:")
+n = int(input())
+print("Array:")
+l = [int(i) for i in input().split()]
+print("y = ", end= '')
+y = int(input())
+
+a = 0
+b = n
+
+while (b - a > 1):
+    c = (a + b) // 2
+    if (l[c] <= y):
+        a = c
+    else:
+        b = c
+print("answer: ")
+print(a)
