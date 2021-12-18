@@ -1,0 +1,61 @@
+#include <iostream>
+#include <map>
+#include <set>
+
+using namespace std;
+
+long long int matrix[101][101];
+long long int dist[100];
+
+int min(int a, int b)
+{
+	if (a < b) return a;
+	return b;
+}
+
+int main() {
+	int n;
+	int s;
+	int f;
+	cin >> n >> s >> f;
+	s = s - 1;
+	f = f - 1;
+	for (int i = 0; i < n; i++)
+	{
+		for (int j = 0; j < n; j++)
+		{
+			cin >> matrix[i][j];
+		}
+	}
+	for (int i = 0; i < n; i++)
+	{
+		dist[i] = -1;
+	}
+	set <pair <long long int, int>> pir;
+	pir.insert(pair <long long int, int>(0, s));
+	while (pir.empty() == false)
+	{
+		//cout << pir.size() << endl;
+		auto it = pir.begin();
+		long long int d = (*it).first;
+		int x = (*it).second;
+		//cout << x << " " << d << " --- ";
+		pir.erase(*it);
+		if (dist[x] != -1)
+		{
+			continue;
+		}
+		dist[x] = d;
+		for (int i = 0; i < n; i++)
+		{
+			if ((matrix[x][i] >= 0) && (i != x))
+			{
+				//cout << i << " ";
+				pir.insert(pair <long long int, int> (d + matrix[x][i], i));
+			}
+		}
+		//cout << endl;
+	}
+	cout << dist[f];
+	return 0;
+}
