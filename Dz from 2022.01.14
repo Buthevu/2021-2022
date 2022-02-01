@@ -1,0 +1,64 @@
+#include <iostream>
+#include <thread>
+#include <mutex>
+#include <chrono>
+#include <algorithm>
+
+using namespace std;
+
+mutex a_lock;
+
+long long int a = 0;
+long long int c = 0;
+
+// стандартный способ вычисления чисел Фибаначи.
+
+void fib(long long int &b,int k)
+{
+	if (k < 2)
+	{
+		a++;
+	}
+	else
+	{
+		fib(b, k - 1);
+		fib(b, k - 2);
+	}
+}
+
+
+int main() {
+	// проверка паралельности вычислений с помощью вычисления чисел фибаначи.
+	
+	/* если запустить этот код, то создадутся два паралельных потока, которые будут обновременно работать и суммарное время работы составит: 2,22242
+	auto start = chrono::steady_clock::now();
+	thread t1(fib, ref(a), 35);
+	thread t2(fib, ref(c), 35);
+	t1.join();
+	t2.join();
+	auto fin = chrono::steady_clock::now();
+	chrono::duration<double> elapsed_seconds = fin - start;
+	cout << a << "   " << elapsed_seconds.count() << "\n";
+	*/
+
+	/* если запустить этот код, то запустится один поток, закончит свою работу, потому запустится второй поток, закончит работу(паралельного вычисления не будет). Суммарное время составит: 3,90787
+	auto start = chrono::steady_clock::now();
+	thread t1(fib, ref(a), 35);
+	t1.join();
+	thread t2(fib, ref(c), 35);
+	t2.join();
+	auto fin = chrono::steady_clock::now();
+	chrono::duration<double> elapsed_seconds = fin - start;
+	cout << a << "   " << elapsed_seconds.count() << "\n";
+	*/
+
+	auto start = chrono::steady_clock::now();
+	thread t1(fib, ref(a), 35);
+	thread t2(fib, ref(c), 35);
+	t1.join();
+	t2.join();
+	auto fin = chrono::steady_clock::now();
+	chrono::duration<double> elapsed_seconds = fin - start;
+	cout << a << "   " << elapsed_seconds.count() << "\n";
+	return 0;
+}
