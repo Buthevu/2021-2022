@@ -1,0 +1,92 @@
+#include <iostream>
+#include <thread>
+#include <mutex>
+#include <chrono>
+#include <algorithm>
+#include <queue>
+#include <map>
+#include <vector>
+
+using namespace std;
+
+mutex a;
+
+bool change = false;
+
+queue <long long int> q;
+
+void generate_prime()
+{
+	long long int i = 2;
+	map <long long int, vector<long long int>> line;
+	while (true)
+	{
+		if (line.find(i) == line.end())
+		{
+			a.lock();
+			change = true;
+			q.push(i);
+			a.unlock();
+			if (line.find(2 * i) == line.end())
+			{
+				vector <long long int> v;
+				v.push_back(i);
+				line[2 * i] = v;
+			}
+			else
+			{
+				line[2 * i].push_back(i);
+			}
+		}
+		else
+		{
+			auto it = line.find(i);
+			for (int x = 0; x < (it->second).size(); x++)
+			{
+				if (line.find(i + it->second[x]) == line.end())
+				{
+					vector <long long int> v;
+					v.push_back(it->second[x]);
+					line[i + it->second[x]] = v;
+				}
+				else
+				{
+					line[i + it->second[x]].push_back(it->second[x]);
+				}
+			}
+			line.erase(it);
+		}
+		i++;
+	}
+}
+
+void print_q()
+{
+	while (true)
+	{
+		if (change == true)
+		{
+			a.lock();
+			while (q.empty() == false)
+			{
+				cout << q.front() << " ";
+				q.pop();
+			}
+			change = false;
+			a.unlock();
+		}
+	}
+}
+
+
+int main() {
+	//auto start = chrono::steady_clock::now();
+	thread t1(generate_prime);
+	thread t2(print_q);
+	t1.join();
+	t2.join();
+	//auto fin = chrono::steady_clock::now();
+	//chrono::duration<double> elapsed_seconds = fin - start;
+	//cout << a << "   " << elapsed_seconds.count() << "\n";
+	return 0;
+}
