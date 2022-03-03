@@ -1,0 +1,118 @@
+#include <iostream>
+#include <mutex>
+#include <vector>
+#include <map>
+#include <condition_variable>
+#include <thread>
+#include <chrono>
+
+using namespace std;
+
+condition_variable cv;
+
+mutex cv_m;
+mutex to_count_mutex;
+mutex get_results_mutex;
+
+int to_count = 0;
+
+map <int, vector <int>> get_results;
+
+bool work = true;
+
+int max(int a, int b)
+{
+	if (a > b)
+	{
+		return a;
+	}
+	else
+	{
+		return b;
+	}
+}
+
+void count_blocks()
+{
+	while (work)
+	{
+		int n;
+		to_count_mutex.lock();
+		n = to_count;
+		to_count++;
+		to_count_mutex.unlock();
+		vector <int> ans;
+		for (int i = max(2, n * 1000); i < (n + 1) * 1000; i++)
+		{
+			bool p = true;
+			for (int j = 2; j < i; j++)
+			{
+				if (i % j == 0)
+				{
+					p = false;
+					break;
+				}
+			}
+			if (p == true)
+			{
+				ans.push_back(i);
+			}
+		}
+		get_results_mutex.lock();
+		get_results.insert(make_pair(n, ans));
+		get_results_mutex.unlock();
+		cv.notify_all();
+	}
+}
+
+void print_prime_numbers()
+{
+	int need_to_do = 0;
+	unique_lock <mutex> lk(cv_m);
+	while (work)
+	{
+		cv.wait(lk);
+		while (true)
+		{
+			get_results_mutex.lock();
+			auto it = get_results.find(need_to_do);
+			if (it == get_results.end())
+			{
+				get_results_mutex.unlock();
+				break;
+			}
+			else
+			{
+				vector <int> to_print = it->second;
+				get_results.erase(it);
+				get_results_mutex.unlock();
+				for (int i = 0; i < to_print.size(); i++)
+				{
+					cout << to_print[i] << " ";
+				}
+				need_to_do++;
+			}
+			if (need_to_do > 110)
+			{
+				work = false;
+			}
+		}
+	}
+}
+
+int main() {
+	cin.tie(nullptr);
+	cout.tie(nullptr);
+	ios_base::sync_with_stdio(false);
+	auto start = chrono::steady_clock::now();
+	thread t1(count_blocks);
+	//thread t2(count_blocks);
+	thread t3(print_prime_numbers);
+	t1.join();
+	//t2.join();
+	t3.join();
+	auto end = chrono::steady_clock::now();
+	chrono::duration <double> elasted_seconds = end - start;
+	cout << endl << elasted_seconds.count() << "s" << endl;
+	return 0;
+}
