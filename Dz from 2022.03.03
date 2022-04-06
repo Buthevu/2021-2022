@@ -15,6 +15,10 @@ int main() {
 			swaps.push_back(make_pair(j, j + 1));
 		}
 	}
+	/*for (int i = n - 2; i > -1; i--)
+	{
+		swaps.push_back(make_pair(i, i + 1));
+	}*/
 	int i = 0;
 	while (i < swaps.size())
 	{
@@ -84,7 +88,7 @@ int main() {
 		for (int i = 0; i < swaps.size(); i++)
 		{
 			long long int x = a & (1 << swaps[i].first);
-			while (((x % 2) == 0) &&(x != 0))
+			while (((x % 2) == 0) && (x != 0))
 			{
 				x = x / 2;
 			}
@@ -95,9 +99,10 @@ int main() {
 			}
 			if (x < y)
 			{
-				a = a - (1 << swaps[i].first);
-				a = a + (1 << swaps[i].second);
+				a = a + (1 << swaps[i].first);
+				a = a - (1 << swaps[i].second);
 			}
+			//cout << t << endl;
 		}
 		bool p = true;
 		while ((a % 2) == 1)
