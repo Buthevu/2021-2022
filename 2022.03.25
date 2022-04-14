@@ -1,0 +1,98 @@
+#include <iostream>
+#include <thread>
+#include <mutex>
+#include <vector>
+
+using namespace std;
+
+int n;
+
+mutex out;
+
+vector <mutex&> forks;
+
+vector <int> owners;
+
+vector <thread> philosophers;
+
+
+/*
+int min(int a, int b)
+{
+	if (a < b)
+	{
+		return a;
+	}
+	else
+	{
+		return b;
+	}
+}
+
+int max(int a, int b)
+{
+	if (a > b)
+	{
+		return a;
+	}
+	else
+	{
+		return b;
+	}
+}*/
+
+void fil(int i)
+{
+	while (true)
+	{
+		forks[min(i, (i + 1) % n)].lock();
+		owners[min(i, (i + 1) % n)] = i;
+		out.lock();
+		for (int i = 0; i < n; i++)
+		{
+			cout << owners[i] << " ";
+		}
+		cout << endl;
+		out.unlock();
+		forks[max(i, (i + 1) % n)].lock();
+		owners[max(i, (i + 1) % n)] = i;
+		out.lock();
+		for (int i = 0; i < n; i++)
+		{
+			cout << owners[i] << " ";
+		}
+		cout << endl;
+		out.unlock();
+		owners[min(i, (i + 1) % n)] = -1;
+		owners[max(i, (i + 1) % n)] = -1;
+		forks[max(i, (i + 1) % n)].unlock();
+		forks[max(i, (i + 1) % n)].unlock();
+		out.lock();
+		for (int i = 0; i < n; i++)
+		{
+			cout << owners[i] << " ";
+		}
+		cout << endl;
+		out.unlock();
+	}
+}
+
+int main() {
+	cin >> n;
+	for (int i = 0; i < n; i++)
+	{
+		mutex a;
+		mutex& r = a;
+		forks.push_back(r);
+		owners.push_back(-1);
+	}
+	for (int i = 0; i < n; i++)
+	{
+		philosophers.push_back(thread(fil, i));
+	}
+	for (int i = 0; i < n; i++)
+	{
+		philosophers[i].join();
+	}
+	return 0;
+}
