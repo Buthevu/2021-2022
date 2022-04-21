@@ -9,7 +9,7 @@ int n;
 
 mutex out;
 
-vector <mutex&> forks;
+vector <mutex*> forks;
 
 vector <int> owners;
 
@@ -45,7 +45,7 @@ void fil(int i)
 {
 	while (true)
 	{
-		forks[min(i, (i + 1) % n)].lock();
+		(*forks[min(i, (i + 1) % n)]).lock();
 		owners[min(i, (i + 1) % n)] = i;
 		out.lock();
 		for (int i = 0; i < n; i++)
@@ -54,7 +54,7 @@ void fil(int i)
 		}
 		cout << endl;
 		out.unlock();
-		forks[max(i, (i + 1) % n)].lock();
+		(*forks[max(i, (i + 1) % n)]).lock();
 		owners[max(i, (i + 1) % n)] = i;
 		out.lock();
 		for (int i = 0; i < n; i++)
@@ -65,8 +65,8 @@ void fil(int i)
 		out.unlock();
 		owners[min(i, (i + 1) % n)] = -1;
 		owners[max(i, (i + 1) % n)] = -1;
-		forks[max(i, (i + 1) % n)].unlock();
-		forks[max(i, (i + 1) % n)].unlock();
+		(*forks[min(i, (i + 1) % n)]).unlock();
+		(*forks[max(i, (i + 1) % n)]).unlock();
 		out.lock();
 		for (int i = 0; i < n; i++)
 		{
@@ -81,8 +81,7 @@ int main() {
 	cin >> n;
 	for (int i = 0; i < n; i++)
 	{
-		mutex a;
-		mutex& r = a;
+		mutex *r = new mutex;
 		forks.push_back(r);
 		owners.push_back(-1);
 	}
